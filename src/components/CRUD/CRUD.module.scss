@@ -36,6 +36,11 @@
                     white-space: nowrap;
                     font-size: 14px;
                 }
+
+                &:hover {
+                    background-color: var(--c-active);
+                }
+
                 &:not(:last-of-type) td {
                     border-bottom: 1px solid var(--c-border);
                 }

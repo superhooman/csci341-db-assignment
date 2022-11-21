@@ -72,7 +72,7 @@ export const MainLayout: React.FC<React.ComponentProps<'div'>> = ({
                     <Item
                         icon={<StackIcon />}
                         href="/diseaseType"
-                        label="Disese Types"
+                        label="Disease Types"
                     />
                     <Item
                         icon={<CookieIcon />}
