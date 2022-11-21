@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model DiseaseType {
+  id          Int      @id @default(autoincrement())
+  description String   @db.VarChar(140)
+
+  diseases    Disease[]
+  specialize  Specialize[]
+}
+
+model Country {
+  cname       String  @id @db.VarChar(50)
+  population  Int
+
+  discover    Discover[]
+  users       Users[]
+  records     Record[]
+}
+
+model Disease {
+  disease_code  String @id @db.VarChar(50)
+  pathogen      String @db.VarChar(20)
+  description   String @db.VarChar(140)
+  id            Int
+
+  diseaseType   DiseaseType @relation(fields: [id], references: [id], onDelete: Cascade)
+  discover      Discover[]
+  records       Record[]
+}
+
+model Discover {
+  cname           String @db.VarChar(50)
+  disease_code    String @db.VarChar(50)
+  first_enc_date  DateTime @db.Date
+
+  @@id([cname, disease_code])
+
+  disease         Disease @relation(fields: [disease_code], references: [disease_code], onDelete: Cascade)
+  country         Country @relation(fields: [cname], references: [cname], onDelete: Cascade)
+}
+
+model Users {
+  email           String @id @db.VarChar(60)
+  name            String @db.VarChar(30)
+  surname         String @db.VarChar(40)
+  salary          Int
+  phone           String @db.VarChar(20)
+  cname           String @db.VarChar(50)
+
+  country         Country @relation(fields: [cname], references: [cname], onDelete: Cascade)
+  publicServant   PublicServant?
+  doctor          Doctor?
+}
+
+model PublicServant {
+  email           String @id @db.VarChar(60)
+  department      String @db.VarChar(50)
+
+  user            Users @relation(fields: [email], references: [email], onDelete: Cascade)
+  records         Record[]
+}
+
+model Doctor {
+  email           String @id @db.VarChar(60)
+  degree          String @db.VarChar(20)
+
+  user            Users @relation(fields: [email], references: [email], onDelete: Cascade)
+  specialize      Specialize[]
+}
+
+model Specialize {
+  id              Int
+  email           String @db.VarChar(60)
+
+  @@id([id, email])
+
+  disease         DiseaseType @relation(fields: [id], references: [id], onDelete: Cascade)
+  doctor          Doctor @relation(fields: [email], references: [email], onDelete: Cascade)
+}
+
+model Record {
+  email          String @db.VarChar(60)
+  cname          String @db.VarChar(50)
+  disease_code   String @db.VarChar(50)
+  total_deaths   Int
+  total_patients Int
+
+  @@id([email, cname, disease_code])
+
+  publicServant  PublicServant @relation(fields: [email], references: [email], onDelete: Cascade)
+  country        Country @relation(fields: [cname], references: [cname], onDelete: Cascade)
+  disease        Disease @relation(fields: [disease_code], references: [disease_code], onDelete: Cascade)
+}
